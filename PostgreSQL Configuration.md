@@ -441,10 +441,18 @@ ORDER BY data
 LIMIT 1000;
 ```
 ### ผลการทดลอง
-```
-1. คำสั่ง EXPLAIN(ANALYZE,BUFFERS) คืออะไร 
-2. รูปผลการรัน
-3. อธิบายผลลัพธ์ที่ได้
+``
+1. คำสั่ง EXPLAIN(ANALYZE,BUFFERS) คืออะไร
+   ตอบ เพื่อ วิเคราะห์ประสิทธิภาพการทำงานของ query อย่างละเอียด
+3. รูปผลการรัน
+4. <img width="1395" height="583" alt="image" src="https://github.com/user-attachments/assets/8ac2d24e-a8ab-4d4e-8f95-00cad48377ea" />
+
+5. อธิบายผลลัพธ์ที่ได้
+6. Buffers: shared hit=5133
+หมายถึง query นี้ อ่านข้อมูลจาก shared buffer (cache) ไป 5,133 blocks
+ใช้ Parallel Query มี worker process 2 ตัว
+เวลาที่ใช้จริง ~91–101 ms
+ใช้ Gather Merge รวมผลจาก worker และทำการ sort ด้วย top-N heapsort ใช้ memory น้อย (~200 KB)
 ```
 ```sql
 -- ทดสอบ Hash operation
@@ -457,10 +465,14 @@ LIMIT 100;
 ```
 
 ### ผลการทดลอง
-```
+``
 1. รูปผลการรัน
-2. อธิบายผลลัพธ์ที่ได้ 
-3. การสแกนเป็นแบบใด เกิดจากเหตุผลใด
+<img width="1372" height="549" alt="image" src="https://github.com/user-attachments/assets/3dee1665-db9e-4c09-867d-ee1760c96cfe" />
+
+2. อธิบายผลลัพธ์ที่ได้
+   ตอบ Query ใช้ Index Only Scan บน idx_large_table_number เพื่อลด I/O ไม่ต้องอ่าน heap table เลย หลังจากนั้นทำ GroupAggregate (count > 1) และเลือกผลลัพธ์ 100 แถวแรก ใช้เวลารวมเพียง ~0.2 ms แสดงว่าดีไซน์           index เหมาะสมและ query มีประสิทธิภาพสูงมาก
+4. การสแกนเป็นแบบใด เกิดจากเหตุผลใด
+   ตอบ เป็น Index Only Scan มี index (idx_large_table_number) ที่ตรงกับเงื่อนไข
 ```
 #### 5.3 การทดสอบ Maintenance Work Memory
 ```sql
@@ -476,8 +488,11 @@ DELETE FROM large_table WHERE id % 10 = 0;
 VACUUM (ANALYZE, VERBOSE) large_table;
 ```
 ### ผลการทดลอง
-```
+``
 1. รูปผลการทดลอง จากคำสั่ง VACUUM (ANALYZE, VERBOSE) large_table;
+<img width="1354" height="564" alt="image" src="https://github.com/user-attachments/assets/ba2c5233-191e-40a1-812b-95f2ba162d27" />
+<img width="1360" height="564" alt="image" src="https://github.com/user-attachments/assets/a12bbbcd-635c-4597-8070-9eb53b83d5a1" />
+
 2. อธิบายผลลัพธ์ที่ได้
 ```
 ### Step 6: การติดตาม Memory Usage
