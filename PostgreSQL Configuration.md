@@ -188,10 +188,15 @@ docker exec postgres-config nproc
 docker exec postgres-config df -h
 ```
 ### บันทึกผลการทดลอง
-```
+``
 1. อธิบายหน้าที่คำสั่ง docker exec postgres-config free, docker exec postgres-config df
-2. option -h ในคำสั่งมีผลอย่างไร
-3. docker exec postgres-config nproc  แสดงค่าผลลัพธ์อย่างไร
+   ตอบ docker exec postgres-config free แสดงค่า Memory ทั้งหมด, ใช้ไปเท่าไหร่, เหลือเท่าไหร่, buffer/cache, และ swap
+       docker exec postgres-config df จะแสดง filesystem ที่ mount อยู่, ขนาดรวม, ใช้ไป, เหลือ, และ mount point
+3. option -h ในคำสั่งมีผลอย่างไร
+   ตอบ ใช้กำหนด hostname ของ container (ชื่อเครื่องภายใน container)
+4. docker exec postgres-config nproc  แสดงค่าผลลัพธ์อย่างไร
+5. <img width="1386" height="360" alt="image" src="https://github.com/user-attachments/assets/55e91f08-c37d-4c5c-966a-f1b11269218c" />
+
 ```
 #### 1.2 เชื่อมต่อและตรวจสอบสถานะปัจจุบัน
 ```bash
@@ -210,7 +215,11 @@ SHOW data_directory;
 ### บันทึกผลการทดลอง
 ```
 1. ตำแหน่งที่อยู่ของไฟล์ configuration อยู่ที่ตำแหน่งใด
+<img width="881" height="563" alt="image" src="https://github.com/user-attachments/assets/a60dfc84-82c6-43c4-b266-8cef147eba8a" />
+
 2. ตำแหน่งที่อยู่ของไฟล์ data อยู่ที่ตำแหน่งใด
+<img width="555" height="151" alt="image" src="https://github.com/user-attachments/assets/6c792516-5816-4c34-8999-c097a37b3fa4" />
+
 ```
 -- ตรวจสอบการตั้งค่าปัจจุบัน
 SELECT name, setting, unit, category, short_desc 
@@ -221,8 +230,10 @@ WHERE name IN (
 );
 ```
 ### บันทึกผลการทดลอง
-```
+``
 บันทึกรูปผลของ configuration ทั้ง 6 ค่า 
+<img width="1359" height="500" alt="image" src="https://github.com/user-attachments/assets/062c7073-bb6a-414b-9ff4-6160b23757f1" />
+
 ```
 
 ### Step 2: การปรับแต่งพารามิเตอร์แบบค่อยเป็นค่อยไป
@@ -238,7 +249,10 @@ WHERE name = 'shared_buffers';
 ```
 1.รูปผลการรันคำสั่ง
 2. ค่า  shared_buffers มีการกำหนดค่าไว้เท่าไหร่ (ใช้ setting X unit)
+<img width="907" height="256" alt="image" src="https://github.com/user-attachments/assets/099d73c5-153a-47f8-b876-43afaa3f023d" />
+
 3. ค่า  pending_restart ในผลการทดลองมีค่าเป็นอย่างไร และมีความหมายอย่างไร
+   16384 PostgreSQL ใช้ค่า shared_buffers = 16384 × 8kB = 131,072 kB = 128 MB ค่านี้มาจากไฟล์ postgresql.conf ending_restart = f หมายความว่า ค่าที่แสดงนี้ใช้งานอยู่แล้วจริง ไม่จำเป็นต้อง restart server
 ```
 -- คำนวณและตั้งค่าใหม่
 -- สำหรับระบบ 2GB: 512MB (25%)
@@ -255,9 +269,14 @@ WHERE name = 'shared_buffers';
 docker exec -it -u postgres postgres-config pg_ctl restart -D /var/lib/postgresql/data -m fast
 
 ### ผลการทดลอง
-```
+``
 รูปผลการเปลี่ยนแปลงค่า pending_restart
+<img width="820" height="255" alt="image" src="https://github.com/user-attachments/assets/568e347b-7ecb-49d1-ace2-cc7d49033b3d" />
+
+
 รูปหลังจาก restart postgres
+<img width="1564" height="524" alt="image" src="https://github.com/user-attachments/assets/e2573ab7-c47b-45d9-b1bc-5e3df92d9295" />
+
 
 ```
 
@@ -280,8 +299,10 @@ FROM pg_settings
 WHERE name = 'work_mem';
 ```
 ### ผลการทดลอง
-```
+``
 รูปผลการเปลี่ยนแปลงค่า work_mem
+<img width="738" height="264" alt="image" src="https://github.com/user-attachments/assets/485284f9-59c0-44e0-b72c-b5bd8bbe17da" />
+
 ```
 
 #### 3.3 ปรับแต่ง Maintenance Work Memory
@@ -297,8 +318,10 @@ SELECT pg_reload_conf();
 SHOW maintenance_work_mem;
 ```
 ### ผลการทดลอง
-```
+``
 รูปผลการเปลี่ยนแปลงค่า maintenance_work_mem
+<img width="620" height="214" alt="image" src="https://github.com/user-attachments/assets/1a9e97ab-0f3b-4601-b78b-7f54fa897808" />
+
 ```
 
 #### 3.4 ปรับแต่ง WAL Buffers
@@ -322,8 +345,10 @@ docker exec -it postgres-config psql -U postgres
 SHOW wal_buffers;
 ```
 ### ผลการทดลอง
-```
+``
 รูปผลการเปลี่ยนแปลงค่า wal_buffers
+<img width="465" height="202" alt="image" src="https://github.com/user-attachments/assets/a4e91f3e-7ffe-4518-aebf-cbce4042f9ab" />
+
 ```
 
 #### 3.5 ปรับแต่ง Effective Cache Size
@@ -339,8 +364,10 @@ SELECT pg_reload_conf();
 SHOW effective_cache_size;
 ```
 ### ผลการทดลอง
-```
+``
 รูปผลการเปลี่ยนแปลงค่า effective_cache_size
+<img width="597" height="199" alt="image" src="https://github.com/user-attachments/assets/41c9baab-831c-49a3-aef1-cfee8c22fc54" />
+
 ```
 
 ### Step 4: ตรวจสอบผล
@@ -368,8 +395,10 @@ WHERE name IN (
 ORDER BY name;
 ```
 ### ผลการทดลอง
-```
+``
 รูปผลการลัพธ์การตั้งค่า
+<img width="1447" height="561" alt="image" src="https://github.com/user-attachments/assets/b5bdb1d1-6c5e-4787-880a-f6a21440945f" />
+
 ```
 
 ### Step 5: การสร้างและทดสอบ Workload
