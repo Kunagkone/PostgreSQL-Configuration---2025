@@ -535,8 +535,10 @@ SELECT
 FROM get_memory_usage();
 ```
 ### ผลการทดลอง
-```
+``
 รูปผลการทดลอง
+<img width="728" height="261" alt="image" src="https://github.com/user-attachments/assets/c31582a7-7a48-48f4-8910-d2cf5bf4c2b1" />
+
 ```
 
 #### 6.2 การติดตาม Buffer Hit Ratio
@@ -556,9 +558,13 @@ WHERE heap_blks_read + heap_blks_hit > 0
 ORDER BY heap_blks_read + heap_blks_hit DESC;
 ```
 ### ผลการทดลอง
-```
+``
 1. รูปผลการทดลอง
+<img width="727" height="161" alt="image" src="https://github.com/user-attachments/assets/6dff5f1d-49b0-457b-aa76-3edbf2c0b99a" />
+
 2. อธิบายผลลัพธ์ที่ได้
+   ตอบ (0 rows)  หมายความว่า ไม่มีข้อมูลใด ๆ ถูกดึงออกมาเลยจากตารางสถิติระบบ (pg_statio_user_tables หรือ view/ตารางที่คุณ query อยู่)
+นั่นแสดงว่า ยังไม่มีตารางใดใน database ของคุณที่มีการอ่านข้อมูลจาก disk (heap_blks_read) หรือจาก buffer cache (heap_blks_hit)
 ```
 #### 6.3 ดู Buffer Hit Ratio ทั้งระบบ
 ```sql
@@ -568,11 +574,17 @@ SELECT datname,
        ROUND((blks_hit::decimal / (blks_read + blks_hit)) * 100, 2) as hit_ratio_percent
 FROM pg_stat_database 
 WHERE datname = current_database();
-```
+``
 ### ผลการทดลอง
 ```
 1. รูปผลการทดลอง
-2. อธิบายผลลัพธ์ที่ได้
+2. <img width="569" height="162" alt="image" src="https://github.com/user-attachments/assets/f2c35d17-3bcb-4c1c-8992-71a8b72e4ccf" />
+
+3. อธิบายผลลัพธ์ที่ได้
+ตอบ  datname  ชื่อ database ที่เก็บสถิติ (ตอนนี้คือ postgres)
+blks_read จำนวน blocks (page) ที่ PostgreSQL ต้องอ่านจาก disk (I/O จริง ๆ) ยิ่งมากหมายถึง query ต้องไปอ่านจาก disk บ่อย
+blks_hit จำนวน blocks ที่ PostgreSQL อ่านจาก shared buffer cache (ในหน่วยความจำ) การอ่านจาก cache เร็วกว่ามาก
+ค่า hit ratio = 92.86% แปลว่า ~93% ของการอ่านข้อมูลดึงจาก cache (เร็ว) มีเพียง ~7% ที่ต้องอ่านจาก disk (ช้า)
 ```
 
 #### 6.4 ดู Table ที่มี Disk I/O มาก
@@ -591,9 +603,12 @@ ORDER BY heap_blks_read DESC
 LIMIT 10;
 ```
 ### ผลการทดลอง
-```
+``
 1. รูปผลการทดลอง
-2. อธิบายผลลัพธ์ที่ได้
+   <img width="1009" height="146" alt="image" src="https://github.com/user-attachments/assets/68b38969-59f6-4987-b3a0-e5ab93456afb" />
+
+3. อธิบายผลลัพธ์ที่ได้
+   
 ```
 ### Step 7: การปรับแต่ง Autovacuum
 
