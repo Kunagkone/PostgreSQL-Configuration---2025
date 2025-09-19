@@ -621,9 +621,18 @@ WHERE name LIKE '%autovacuum%'
 ORDER BY name;
 ```
 ### ผลการทดลอง
-```
+``
 1. รูปผลการทดลอง
+<img width="1320" height="532" alt="image" src="https://github.com/user-attachments/assets/4bd2931e-bc5f-4249-bcee-29310ee49b65" />
+
 2. อธิบายค่าต่าง ๆ ที่มีความสำคัญ
+3. autovacuum ค่า: on เปิด/ปิด Autovacuum autovacuum_analyze_scale_factor และ autovacuum_analyze_threshold ค่า: 0.1 และ 50
+Autovacuum จะสั่ง ANALYZE เมื่อมีการเปลี่ยนข้อมูลถึง 10% ของตาราง หรืออย่างน้อย 50 แถว autovacuum_vacuum_scale_factor และ autovacuum_vacuum_threshold  ป้องกัน bloat และ reclaim space ของตาราง
+autovacuum_freeze_max_age ป้องกัน Transaction ID Wraparound
+autovacuum_multixact_freeze_max_age
+autovacuum_max_workers จำนวน worker process ที่รัน autovacuum ได้พร้อมกัน
+autovacuum_naptime ระยะเวลาพักก่อน autovacuum scan รอบถัดไป
+autovacuum_vacuum_cost_delay และ autovacuum_vacuum_cost_limit กำหนด “ความเร็ว” ของ vacuum
 ```
 
 #### 7.2 การปรับแต่ง Autovacuum สำหรับประสิทธิภาพ
@@ -651,8 +660,11 @@ ALTER SYSTEM SET autovacuum_work_mem = '512MB';
 SELECT pg_reload_conf();
 ```
 ### ผลการทดลอง
-```
+``
 รูปผลการทดลองการปรับแต่ง Autovacuum (Capture รวมทั้งหมด 1 รูป)
+<img width="720" height="374" alt="image" src="https://github.com/user-attachments/assets/07a121a7-b78b-4393-b6d1-219152c32f94" />
+
+
 ```
 
 ### Step 8: Performance Testing และ Benchmarking
