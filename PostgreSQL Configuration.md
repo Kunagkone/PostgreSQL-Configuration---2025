@@ -738,8 +738,12 @@ FROM performance_results
 ORDER BY test_timestamp DESC;
 ```
 ### ผลการทดลอง
-```
+``
 1. รูปผลการทดลอง
+<img width="777" height="204" alt="image" src="https://github.com/user-attachments/assets/fd138543-4ef9-4fb7-9786-c07c5109fe92" />
+<img width="784" height="173" alt="image" src="https://github.com/user-attachments/assets/1212ad61-5ede-4caf-8a31-4d9f2c9632b8" />
+<img width="618" height="174" alt="image" src="https://github.com/user-attachments/assets/18e797da-6128-4c76-befd-c479d8f1be31" />
+
 2. อธิบายผลลัพธ์ที่ได้
 ```
 
@@ -775,8 +779,10 @@ FROM pg_settings WHERE name = 'maintenance_work_mem';
 SELECT * FROM memory_monitor;
 ```
 ### ผลการทดลอง
-```
+``
 รูปผลการทดลอง
+<img width="749" height="207" alt="image" src="https://github.com/user-attachments/assets/b5ecc72e-a986-4ced-8487-0b4da21d8248" />
+
 ```
 
 ### Step 10: การจำลอง Load Testing
@@ -824,8 +830,10 @@ CREATE INDEX idx_orders_product_id ON load_test_orders(product_id);
 CREATE INDEX idx_orders_date ON load_test_orders(order_date);
 ```
 ### ผลการทดลอง
-```
+``
 รูปผลการทดลอง การสร้าง FUNCTION และ INDEX
+<img width="844" height="191" alt="image" src="https://github.com/user-attachments/assets/75185237-a0d0-40ff-a141-d7e1d5ba1589" />
+
 ```
 
 #### 10.2 การทดสอบ Query Performance
@@ -999,24 +1007,48 @@ $$ LANGUAGE plpgsql;
 -- รัน load test ทดสอบเบาๆ
 SELECT * FROM simulate_oltp_workload(25);
 
-```
+``
 ### ผลการทดลอง
-```
+<img width="800" height="213" alt="image" src="https://github.com/user-attachments/assets/cd6e7773-91fb-438b-b043-bd576603cea6" />
+
+``
 รูปผลการทดลอง
+<img width="800" height="213" alt="image" src="https://github.com/user-attachments/assets/79e170ff-0b95-425f-a237-4097358d2ac2" />
+
 ```
 -- ทดสอบปานกลาง  
 SELECT * FROM simulate_oltp_workload(100);
 ### ผลการทดลอง
 ```
 1. รูปผลการทดลอง
-2. อธิบายผลการทดลอง การ SELECT , INSERT, UPDATE, DELETE เป็นอย่างไร 
+2. <img width="836" height="219" alt="image" src="https://github.com/user-attachments/assets/2b908d19-e41a-4f60-a238-06d71d67a25f" />
+
+3. อธิบายผลการทดลอง การ SELECT , INSERT, UPDATE, DELETE เป็นอย่างไร
+4. 1. SELECT (JOIN + WHERE)
+เวลาเฉลี่ย: 0.034 ms
+ต่ำสุด: 0.015 ms
+สูงสุด: 0.771 ms
+2. INSERT
+เวลาเฉลี่ย: 0.025 ms
+ต่ำสุด: 0.005 ms
+สูงสุด: 0.208 ms
+3. UPDATE
+เวลาเฉลี่ย: 68.761 ms
+ต่ำสุด: 64.817 ms
+สูงสุด: 77.714 ms
+4. DELETE (soft delete)
+เวลาเฉลี่ย: 84.561 ms
+ต่ำสุด: 80.954 ms
+สูงสุด: 95.562 ms
 ```
 
 -- ทดสอบหนักขึ้น เครื่องใครไม่ไหวผ่านก่อน หรือเปลี่ยนค่า 500 เป็น 200 :)
-SELECT * FROM simulate_oltp_workload(500);
+SELECT * FROM simulate_oltp_workload(200);
 ### ผลการทดลอง
 ```
 รูปผลการทดลอง
+<img width="786" height="236" alt="image" src="https://github.com/user-attachments/assets/21a1091c-b5bc-4567-8e5e-415c394e2bfa" />
+
 ```
 
 ### Step 11: การเปรียบเทียบประสิทธิภาพ
