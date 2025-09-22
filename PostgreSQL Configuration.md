@@ -1579,9 +1579,29 @@ Estimated Usage = 2GB + (32MB × 100 × 0.5) + 512MB + 64MB
 
 ## คำถามท้ายการทดลอง
 1. หน่วยความจำใดบ้างที่เป็น shared memory และมีหลักในการตั้งค่าอย่างไร
-2. Work memory และ maintenance work memory คืออะไร มีหลักการในการกำหนดค่าอย่างไร
-3. หากมี RAM 16GB และต้องการกำหนด connection = 200 ควรกำหนดค่า work memory และ maintenance work memory อย่างไร
-4. ไฟล์ postgresql.conf และ postgresql.auto.conf  มีความสัมพันธ์กันอย่างไร
-5. Buffer hit ratio คืออะไร
-6. แสดงผลการคำนวณ การกำหนดค่าหน่วยความจำต่าง ๆ โดยอ้างอิงเครื่องของตนเอง
-7. การสแกนของฐานข้อมูล PostgreSQL มีกี่แบบอะไรบ้าง เปรียบเทียบการสแกนแต่ละแบบ
+   Shared memory ที่สำคัญคือ shared_buffers และ wal_buffers
+ตั้งค่า shared_buffers ≈ 25% RAM เป็นจุดเริ่มต้นที่ดี
+ส่วน work_mem, maintenance_work_mem ไม่ใช่ shared memory แต่ก็สำคัญกับ performance
+ถ้า workload อ่านเยอะ → เน้น shared_buffers
+ถ้า workload เขียนเยอะ → ตรวจสอบ wal_buffers และ I/O subsystem
+
+3. Work memory และ maintenance work memory คืออะไร มีหลักการในการกำหนดค่าอย่างไร
+   work_mem = memory ต่อ query operation → ตั้งให้พอดีตามจำนวน concurrent connections
+  maintenance_work_mem = memory สำหรับงานจัดการ DB → ตั้งใหญ่ ๆ ได้ จะช่วยให้ VACUUM/INDEX เร็วขึ้น
+5. หากมี RAM 16GB และต้องการกำหนด connection = 200 ควรกำหนดค่า work memory และ maintenance work memory อย่างไร
+work_mem ไม่เล็กเกินไป (sort/join ยังทำใน memory ได้)
+maintenance_work_mem ใหญ่พอสำหรับ VACUUM/INDEX ให้เร็วขึ้น
+รวม usage ยังไม่เกิน 16GB แม้ใน worst case
+
+7. ไฟล์ postgresql.conf และ postgresql.auto.conf  มีความสัมพันธ์กันอย่างไร
+postgresql.conf = ไฟล์หลัก, แก้ด้วยมือ
+postgresql.auto.conf = ไฟล์ override, แก้โดย ALTER SYSTEM
+เวลารันจริง → ค่าใน postgresql.auto.conf มีลำดับความสำคัญสูงกว่า
+9. Buffer hit ratio คืออะไร
+   เป็น “อัตราส่วน” ระหว่า  จำนวนครั้งที่เจอข้อมูลใน buffer (blks_hit
+11. แสดงผลการคำนวณ การกำหนดค่าหน่วยความจำต่าง ๆ โดยอ้างอิงเครื่องของตนเอง
+    
+13. การสแกนของฐานข้อมูล PostgreSQL มีกี่แบบอะไรบ้าง เปรียบเทียบการสแกนแต่ละแบบ
+    <img width="997" height="479" alt="image" src="https://github.com/user-attachments/assets/31e45023-a061-4c9d-8967-5e1e84576c43" />
+
+    
